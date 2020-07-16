@@ -4,15 +4,6 @@ Generates an interface for golang struct.
 
 > For detected bugs please contact: marco-engstler@gmx.de
 
-- [Interfacer](#interfacer)
-  - [Installation](#installation)
-  - [Usage](#usage)
-    - [Flags](#flags)
-  - [Examples](#examples)
-    - [Generate manually](#generate-manually)
-    - [Generate by go generate](#generate-by-go-generate)
-    - [Example output for _CompositeParamsInterface_ in file interfaces/interfaces_test.go](#example-output-for-compositeparamsinterface-in-file-interfacesinterfaces_testgo)
-
 ## Installation
 
 ```bash
@@ -49,7 +40,7 @@ interfacer --for "github.com/hanofzelbri/interfacer/interfaces.ExampleStruct" --
 //go:generate interfacer --for "github.com/hanofzelbri/interfacer/interfaces.ExampleStruct" -as "generator.ExampleStructInterface" -o "generator/output.go"
 ```
 
-### Example output for _CompositeParamsInterface_ in file [interfaces/interfaces_test.go](interfaces/interfaces_test.go)
+### Example output for *ExampleStruct* in file [generator/struct_definitions_test.go](generator/struct_definitions_test.go)
 
 ```go
 
