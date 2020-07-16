@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/hanofzelbri/interfacer/generator"
 
@@ -27,7 +28,7 @@ interfacer --for "github.com/hanofzelbri/interfacer/generator.ExampleStruct" -o 
 
 //go:generate interfacer --for "github.com/hanofzelbri/interfacer/generator.ExampleStruct" -o "struct.go"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s, err := generator.BuildStruct(options)
+		s, err := generator.BuildInterface(options)
 		if err != nil {
 			return err
 		}
@@ -35,6 +36,10 @@ interfacer --for "github.com/hanofzelbri/interfacer/generator.ExampleStruct" -o 
 		template, err := generator.InterfaceTemplate(s)
 		if err != nil {
 			return fmt.Errorf("%v\n\nerr: %v", string(template), err)
+		}
+
+		if err := os.MkdirAll(filepath.Dir(options.Output), os.ModePerm); err != nil {
+			return err
 		}
 
 		f := os.Stdout

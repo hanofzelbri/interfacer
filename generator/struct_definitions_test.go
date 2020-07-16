@@ -9,6 +9,7 @@ import (
 )
 
 // ExampleStruct is a dummy struct to test the program
+// Continue Comment
 type ExampleStruct struct{}
 
 // EmptyExportedMethod is struct method without param and return value
@@ -18,7 +19,7 @@ func (e ExampleStruct) EmptyExportedMethod() {}
 func (e *ExampleStruct) EmptyExportedReferenceMethod() {}
 
 // ParameterMethod is struct method with params and return values
-func (e *ExampleStruct) ParameterMethod(param1, param2 string) (int, error) {
+func (e *ExampleStruct) ParameterMethod(param1, param2 string, emptyInterface interface{}) (int, error) {
 	return 0, errors.New("Error")
 }
 

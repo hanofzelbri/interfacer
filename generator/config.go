@@ -1,9 +1,9 @@
 package generator
 
 import (
+	"fmt"
 	"go/parser"
 	"strings"
-	"unicode"
 
 	"golang.org/x/tools/go/loader"
 )
@@ -30,15 +30,16 @@ func outputPackageName(as string, packageName string) string {
 }
 
 func outputInterfaceName(as string, structName string) string {
-	interfaceName := as
+	interfaceName := fmt.Sprintf("%vInterface", structName)
 
-	if interfaceName == "" {
-		interfaceName = string(unicode.ToLower(rune(structName[0]))) + structName[1:]
+	if as == "" {
+		return interfaceName
 	}
 
-	if i := strings.IndexRune(as, '.'); i != -1 {
-		interfaceName = (as)[i+1:]
+	i := strings.IndexRune(as, '.')
+	if i == -1 {
+		return interfaceName
 	}
 
-	return interfaceName
+	return (as)[i+1:]
 }

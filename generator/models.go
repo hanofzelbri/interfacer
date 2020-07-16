@@ -25,11 +25,11 @@ type Config struct {
 
 // Interface represents an interface signature
 type Interface struct {
-	Name      string   `json:"name,omitempty"`
-	Package   string   `json:"package,omitempty"`
-	Comment   string   `json:"comment,omitempty"`
-	Functions []Func   `json:"functions,omitempty"`
-	Imports   []Import `json:"imports,omitempty"`
+	Name      string    `json:"name,omitempty"`
+	Package   string    `json:"package,omitempty"`
+	Comment   string    `json:"comment,omitempty"`
+	Functions Functions `json:"functions,omitempty"`
+	Imports   Imports   `json:"imports,omitempty"`
 }
 
 // Func represents a function signature
@@ -58,3 +58,17 @@ type Import struct {
 	Package string `json:"package,omitempty"`
 	Path    string `json:"path,omitempty"`
 }
+
+// Functions is a slice of Func
+type Functions []Func
+
+func (functions Functions) Len() int           { return len(functions) }
+func (functions Functions) Swap(i, j int)      { functions[i], functions[j] = functions[j], functions[i] }
+func (functions Functions) Less(i, j int) bool { return functions[i].Name < functions[j].Name }
+
+// Imports is slice of Import
+type Imports []Import
+
+func (imports Imports) Len() int           { return len(imports) }
+func (imports Imports) Swap(i, j int)      { imports[i], imports[j] = imports[j], imports[i] }
+func (imports Imports) Less(i, j int) bool { return imports[i].Path < imports[j].Path }

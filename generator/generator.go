@@ -9,8 +9,8 @@ import (
 	"strings"
 )
 
-// BuildStruct creates an Interface object for provided options
-func BuildStruct(options Options) (*Interface, error) {
+// BuildInterface creates an Interface object for provided options
+func BuildInterface(options Options) (*Interface, error) {
 	config, err := setupConfig(options)
 	if err != nil {
 		return nil, err
@@ -26,14 +26,18 @@ func BuildStruct(options Options) (*Interface, error) {
 		return nil, err
 	}
 
+	interfaceName := outputInterfaceName(options.As, config.StructName)
+	interfaceComment := fmt.Sprintf("// %v generated for %v\n", interfaceName, options.For)
+	interfaceComment += commentText(config, config.Object.Pos())
+
 	s := &Interface{
-		Name:      outputInterfaceName(options.As, config.StructName),
-		Comment:   commentText(config, config.Object.Pos()),
+		Name:      interfaceName,
+		Comment:   interfaceComment,
 		Package:   outputPackageName(options.As, config.Package.Name()),
 		Functions: funcs,
 	}
 
-	fixupStruct(s)
+	fixupInterface(s)
 
 	return s, nil
 }
@@ -41,11 +45,18 @@ func BuildStruct(options Options) (*Interface, error) {
 func setupConfig(options Options) (*Config, error) {
 	idx := strings.LastIndex(options.For, ".")
 	if idx == -1 || options.For[:idx] == "" || options.For[idx+1:] == "" {
-		return nil, fmt.Errorf("--interface (-i) flag should be like path/to/package.type")
+		return nil, fmt.Errorf("--for flag should be like path/to/package.type")
 	}
 
 	structName := options.For[idx+1:]
 	packageName := options.For[:idx]
+
+	if options.As != "" {
+		idx := strings.LastIndex(options.As, ".")
+		if idx == -1 || options.For[:idx] == "" || options.For[idx+1:] == "" {
+			return nil, fmt.Errorf("--as flag should be like path/to/package.type")
+		}
+	}
 
 	program, err := loadProgram(packageName)
 	if err != nil {
@@ -205,6 +216,8 @@ func configureParamType(t *Type, typ types.Type) {
 	case *types.Map:
 		configureParamTypeName(t, typ.String())
 		configureParamType(t, typ.Elem())
+	case *types.Interface:
+		configureParamTypeName(t, typ.String())
 	}
 }
 
@@ -214,13 +227,13 @@ func configureParamTypeName(t *Type, name string) {
 	}
 }
 
-func fixupStruct(s *Interface) {
-	imports := map[string]Import{}
+func fixupInterface(s *Interface) {
+	uniqueImports := map[string]Import{}
 
 	for fi, f := range s.Functions {
 		for pi, p := range f.Params {
 			for _, i := range p.Type.Imports {
-				imports[i.Path] = i
+				uniqueImports[i.Path] = i
 				s.Functions[fi].Params[pi].Type.Name = strings.ReplaceAll(p.Type.Name, i.Path, i.Package)
 			}
 
@@ -230,19 +243,19 @@ func fixupStruct(s *Interface) {
 		}
 		for ri, p := range f.Res {
 			for _, i := range p.Type.Imports {
-				imports[i.Path] = i
+				uniqueImports[i.Path] = i
 				s.Functions[fi].Res[ri].Type.Name = strings.ReplaceAll(p.Type.Name, i.Path, i.Package)
 			}
 		}
 	}
 
-	keys := make([]string, 0, len(imports))
-	for k := range imports {
-		keys = append(keys, k)
+	imports := Imports{}
+	for _, value := range uniqueImports {
+		imports = append(imports, value)
 	}
-	sort.Strings(keys)
 
-	for _, k := range keys {
-		s.Imports = append(s.Imports, imports[k])
-	}
+	sort.Sort(imports)
+	s.Imports = imports
+
+	sort.Sort(s.Functions)
 }

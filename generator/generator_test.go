@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestBuildStruct(t *testing.T) {
+func TestBuildInterface(t *testing.T) {
 	o := Options{
 		As:     "test.Interface",
 		Output: "",
@@ -29,13 +29,13 @@ func TestBuildStruct(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := BuildStruct(tt.options())
+			got, err := BuildInterface(tt.options())
 			if (err != nil) != tt.wantErr {
-				t.Errorf("BuildStruct() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("BuildInterface() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("BuildStruct() = %v, want %v", got, tt.want)
+				t.Errorf("BuildInterface() = %v, want %v", got, tt.want)
 			}
 		})
 	}
